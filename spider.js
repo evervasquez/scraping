@@ -52,12 +52,25 @@ function parseResults() {
     console.log('Iniciando...');
     page.evaluate(function() {
         console.log('entre...');
-        var selector = 'div[class="canalLeft"] a img';
-       
+
+        var selector = 'div[class="tituloCanal1Linea"]';
+
         $(selector).each(function(index, link) {
-            var imagen = $(link).attr("src");
-            console.log(imagen);
+            var titulo = $(link).text();
+            console.log(titulo);
+            save(titulo);
         })
     });
     phantom.exit();
+}
+
+function save(descripcion) {
+    $.post('save.php', 'descripcion=' + descripcion, function(datos, status) {
+        if (status) {
+            console.log('guarde');
+
+        } else {
+            console.log('no guarde');
+        }
+    }, 'json');
 }
