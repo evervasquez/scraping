@@ -23,7 +23,7 @@ page.open(url, function(status) {
         console.log('============================================');
 
         // Inject jQuery for scraping (you need to save jquery-1.6.1.min.js in the same folder as this file)
-        page.injectJs('jquery-1.6.1.min.js');
+        page.injectJs('jquery.min.js');
 
         // Our "event loop"
         if (!phantom.state) {
@@ -53,24 +53,31 @@ function parseResults() {
     page.evaluate(function() {
         console.log('entre...');
 
-        var selector = 'div[class="tituloCanal1Linea"]';
+        var selector = 'li[class="channel"]';
 
         $(selector).each(function(index, link) {
-            var titulo = $(link).text();
+            var imagen = $(link).children('div[class="canalLeft"]').children('a').children('img').attr('src')
+            var titulo = $(link).children('div[class="canalRight"]').children('div[class="tituloCanal1Linea"]').text();
             console.log(titulo);
-            save(titulo);
+
+            var request = $.ajax({
+                type: "POST",
+                url: "http://localhost/spider/post.php",
+                data: 'descripcion='+titulo+'&imagen='+imagen,
+                async:false,
+                cache:false
+            });
+
+            request.done(function(msg) {
+                console.log("Data Saved: " + msg);
+            });
+            
+            request.error(function(msg) {
+                console.log("Error : " + msg);
+            });
+            
+            console.log("final");
         })
     });
     phantom.exit();
-}
-
-function save(descripcion) {
-    $.post('save.php', 'descripcion=' + descripcion, function(datos, status) {
-        if (status) {
-            console.log('guarde');
-
-        } else {
-            console.log('no guarde');
-        }
-    }, 'json');
 }
