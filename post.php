@@ -1,5 +1,5 @@
 <?php
-sleep(3);
+sleep(1);
 $descripcion = $_POST['descripcion'];
 $imagen = $_POST['imagen'];
 
