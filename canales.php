@@ -1,4 +1,5 @@
 <?php
+//sleep(1);
 $descripcion = $_POST['descripcion'];
 $imagen = $_POST['imagen'];
 $id = $_POST['idcanales'];

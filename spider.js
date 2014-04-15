@@ -59,9 +59,9 @@ function parseResults() {
             var imagen = $(link).children('div[class="canalLeft"]').children('a').children('img').attr('src')
             var titulo = $(link).children('div[class="canalRight"]').not('div[class="canalRightTecnologies"]').text();
             var idcanales = $(link).attr('id');
-            
+
             console.log(idcanales);
-            
+
             var request = $.ajax({
                 type: "POST",
                 url: "http://localhost/spider/canales.php",
@@ -71,54 +71,63 @@ function parseResults() {
             });
 
             request.done(function(msg) {
+            });
 
+            request.error(function(msg) {
+                //console.log("Error : " + msg);
                 console.log("Canal guardado: " + msg);
 
-                var selector2 = 'ul[id="channel' + idcanales + '"]';
+                var selector2 = 'ul[id="channel' + idcanales + '"] li';
 
                 $(selector2).each(function(index, link) {
-                    var tituloprograma = $(link).children('li').children('a').attr('title');
-                    var tempid = $(link).children('li').children('a').attr('id');
-                    var arrayid = tempid.split('-');
-                    var idhorarios = arrayid[2] + arrayid[3] + arrayid[4] + arrayid[5] + arrayid[6] + arrayid[7] + arrayid[8];
 
-                    var request1 = $.ajax({
-                        type: "POST",
-                        url: "http://localhost/spider/horarios.php",
-                        data: 'idhorarios=' + idhorarios + '&descripcion=' + tempid,
-                        async: false,
-                        cache: false
-                    });
+                    if ($(link).attr('class') != "programs-empty") {
 
-                    request1.done(function(msg) {
-                        console.log("Horario Guardado: " + msg);
+                        var tituloprograma = $(link).children('a').attr('title');
+                        var tempid = $(link).children('a').attr('id');
+                        var arrayid = tempid.split('-');
+                        var idhorarios = arrayid[2].toString() + arrayid[3].toString() + arrayid[4].toString() + arrayid[5].toString() + arrayid[6].toString() + arrayid[7].toString() + arrayid[8].toString();
 
-                        var request2 = $.ajax({
+                        var request1 = $.ajax({
                             type: "POST",
-                            url: "http://localhost/spider/programacion.php",
-                            data: 'idcanales=' + idcanales + '&idhorarios=' + idhorarios + '&tituloprograma=' + tituloprograma,
+                            url: "http://localhost/spider/horarios.php",
+                            data: 'idhorarios=' + idhorarios + '&descripcion=' + tempid,
                             async: false,
                             cache: false
                         });
 
-                        request2.done(function(msg) {
+                        request1.done(function(msg) {
 
-                            console.log("Programación Guardada: " + msg);
 
                         });
 
-                    });
+                        request1.error(function(msg) {
+                            console.log("Error : " + msg);
+                            var request2 = $.ajax({
+                                type: "POST",
+                                url: "http://localhost/spider/programacion.php",
+                                data: 'idcanales=' + idcanales + '&idhorarios=' + idhorarios + '&tituloprograma=' + tituloprograma,
+                                async: false,
+                                cache: false
+                            });
 
-                    request1.error(function(msg) {
-                        console.log("Error : " + msg);
-                    });
+                            request2.done(function(msg) {
+
+                                console.log("Programación Guardada: " + msg);
+
+                            });
+
+                        });
+
+                        arrayid = null;
+                        tempid = null;
+                        tituloprograma = null;
+                        idhorarios = null;
+                    }
+
 
                 });
 
-            });
-
-            request.error(function(msg) {
-                console.log("Error : " + msg);
             });
 
             console.log("final");

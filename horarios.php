@@ -1,5 +1,5 @@
 <?php
-
+//sleep(1);
 $idhorarios = $_POST['idhorarios'];
 $descripcion = $_POST['descripcion'];
 

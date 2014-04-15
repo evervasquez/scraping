@@ -1,4 +1,5 @@
 <?php
+//sleep(1);
 $idcanales = $_POST['idcanales'];
 $idhorarios = $_POST['idhorarios'];
 $tituloprograma = $_POST['tituloprograma'];
