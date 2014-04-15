@@ -57,25 +57,70 @@ function parseResults() {
 
         $(selector).each(function(index, link) {
             var imagen = $(link).children('div[class="canalLeft"]').children('a').children('img').attr('src')
-            var titulo = $(link).children('div[class="canalRight"]').children('div[class="tituloCanal1Linea"]').text();
-            console.log(titulo);
-
+            var titulo = $(link).children('div[class="canalRight"]').not('div[class="canalRightTecnologies"]').text();
+            var idcanales = $(link).attr('id');
+            
+            console.log(idcanales);
+            
             var request = $.ajax({
                 type: "POST",
-                url: "http://localhost/spider/post.php",
-                data: 'descripcion='+titulo+'&imagen='+imagen,
-                async:false,
-                cache:false
+                url: "http://localhost/spider/canales.php",
+                data: 'descripcion=' + titulo + '&imagen=' + imagen + '&idcanales=' + idcanales,
+                async: false,
+                cache: false
             });
 
             request.done(function(msg) {
-                console.log("Data Saved: " + msg);
+
+                console.log("Canal guardado: " + msg);
+
+                var selector2 = 'ul[id="channel' + idcanales + '"]';
+
+                $(selector2).each(function(index, link) {
+                    var tituloprograma = $(link).children('li').children('a').attr('title');
+                    var tempid = $(link).children('li').children('a').attr('id');
+                    var arrayid = tempid.split('-');
+                    var idhorarios = arrayid[2] + arrayid[3] + arrayid[4] + arrayid[5] + arrayid[6] + arrayid[7] + arrayid[8];
+
+                    var request1 = $.ajax({
+                        type: "POST",
+                        url: "http://localhost/spider/horarios.php",
+                        data: 'idhorarios=' + idhorarios + '&descripcion=' + tempid,
+                        async: false,
+                        cache: false
+                    });
+
+                    request1.done(function(msg) {
+                        console.log("Horario Guardado: " + msg);
+
+                        var request2 = $.ajax({
+                            type: "POST",
+                            url: "http://localhost/spider/programacion.php",
+                            data: 'idcanales=' + idcanales + '&idhorarios=' + idhorarios + '&tituloprograma=' + tituloprograma,
+                            async: false,
+                            cache: false
+                        });
+
+                        request2.done(function(msg) {
+
+                            console.log("Programación Guardada: " + msg);
+
+                        });
+
+                    });
+
+                    request1.error(function(msg) {
+                        console.log("Error : " + msg);
+                    });
+
+                });
+
             });
-            
+
             request.error(function(msg) {
                 console.log("Error : " + msg);
             });
-            
+
             console.log("final");
         })
     });
