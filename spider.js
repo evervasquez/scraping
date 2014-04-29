@@ -82,7 +82,6 @@ function parseResults() {
                 $(selector2).each(function(index, link) {
 
                     if ($(link).attr('class') != "programs-empty") {
-
                         var tituloprograma = $(link).children('a').attr('title');
                         var tempid = $(link).children('a').attr('id');
                         var arrayid = tempid.split('-');
